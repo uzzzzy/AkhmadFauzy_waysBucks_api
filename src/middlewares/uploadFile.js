@@ -3,7 +3,8 @@ const multer = require('multer')
 exports.uploadFile = (imageFile) => {
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
-            cb(null, "uploads")
+            const path = (req.url.split('/')[1])
+            cb(null, `uploads/${path}s`)
         },
 
         filename: function (req, file, cb){
@@ -63,10 +64,10 @@ exports.uploadFile = (imageFile) => {
 }
 
 exports.updateImage = (imageFile) => {
-
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
-            cb(null, "uploads")
+            const path = (req.url.split('/')[1])
+            cb(null, `uploads/${path}s`)
         },
 
         filename: function (req, file, cb){

@@ -1,10 +1,10 @@
 const fs = require('fs')
 
-const { product } = require('../../models')
+const { topping } = require('../../models')
 
-exports.getProducts = async (req, res) => {
+exports.getToppings = async (req, res) => {
     try {
-        const products = await product.findAll({
+        const toppings = await topping.findAll({
             attributes: {
                 exclude: ["createdAt","updatedAt"]
             },
@@ -13,7 +13,7 @@ exports.getProducts = async (req, res) => {
         res.send({
             status: 'success',
             data: {
-                products,
+                toppings,
             }
         })
     }catch (error) {
@@ -24,10 +24,10 @@ exports.getProducts = async (req, res) => {
     }
 }
 
-exports.getProduct = async (req, res) => {
+exports.getTopping = async (req, res) => {
     try {
         const { id } = req.params
-        const products = await product.findOne({
+        const toppings = await topping.findOne({
             where: {
                 id,
             },
@@ -39,7 +39,7 @@ exports.getProduct = async (req, res) => {
         res.send({
             status: 'success',
             data: {
-                products,
+                toppings,
             }
         })
     }catch (error) {
@@ -50,9 +50,9 @@ exports.getProduct = async (req, res) => {
     }
 }
 
-exports.addProduct = async (req, res) => {
+exports.addTopping = async (req, res) => {
     if(!req.body.title || !req.body.price){    
-        fs.unlink("./uploads/products/"+req.file.filename, (err) => {
+        fs.unlink("./uploads/toppings/"+req.file.filename, (err) => {
             if (err) {
             console.error(err)
             }
@@ -63,9 +63,8 @@ exports.addProduct = async (req, res) => {
             message: "No data",
         });
     }
-
     try {
-        const newProduct = await product.create({
+        const newTopping = await topping.create({
             title: req.body.title,
             price: req.body.price,
             image: req.file.filename
@@ -74,9 +73,9 @@ exports.addProduct = async (req, res) => {
         res.status(200).send({
             status: 'success',
             data: {
-                title: newProduct.title,
-                price: newProduct.price,
-                image: newProduct.image
+                title: newTopping.title,
+                price: newTopping.price,
+                image: newTopping.image
             }
         })
         
@@ -88,36 +87,35 @@ exports.addProduct = async (req, res) => {
     }
 }
 
-exports.updateProduct = async (req, res)=> {
-
+exports.updateTopping = async (req, res) => {
     const { id } = req.params
-    const products = req.body
+    const toppings = req.body
 
     if(req.file){
-        products.image = req.file.filename
-        const {image} = await product.findOne({
+        toppings.image = req.file.filename
+        const {image} = await topping.findOne({
             where: {
                 id,
             },
             attributes: ["image"]
         })
 
-        fs.unlink("./uploads/products/"+image, (err) => {
+        fs.unlink("./uploads/toppings/"+image, (err) => {
             if (err) {
               console.error(err)
             }
         })
     }
-    
+    console.log(toppings)
     try {
 
-        await product.update(products,{
+        await topping.update(toppings,{
             where: {
                 id
             }
         })
 
-        const data = await product.findOne({ 
+        const data = await topping.findOne({ 
             where: { id },
             attributes: {
                 exclude: ["createdAt","updatedAt"]
@@ -136,40 +134,5 @@ exports.updateProduct = async (req, res)=> {
             status: 'error',
             message: 'Server Error'
         })
-    }
-}
-
-exports.deleteProduct = async (req, res) => {
-    try {
-        const { id } = req.params
-
-        const products = await product.findOne({
-            where: {
-                id,
-            },
-            attributes: ["image"]
-        })
-
-        const data = await product.destroy({
-            where: { id }
-        })
-
-        fs.unlink("./uploads/products/"+products.image, (err) => {
-            if (err) {
-              console.error(err)
-            }
-        })
-
-        res.send({
-            status: 'success',
-            data: {
-                "id": data
-            }
-        })
-    }catch(error) {
-        res.send({
-          status: "failed",
-          message: "Server Error",
-        });
     }
 }
