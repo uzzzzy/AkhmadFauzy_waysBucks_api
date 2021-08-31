@@ -136,3 +136,41 @@ exports.updateTopping = async (req, res) => {
         })
     }
 }
+
+exports.deleteTopping = async (req, res) => {
+    
+exports.deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const toppings = await product.findOne({
+            where: {
+                id,
+            },
+            attributes: ["image"]
+        })
+
+        const data = await product.destroy({
+            where: { id }
+        })
+
+        fs.unlink("./uploads/toppings/"+toppings.image, (err) => {
+            if (err) {
+              console.error(err)
+            }
+        })
+
+        res.send({
+            status: 'success',
+            data: {
+                "id": data
+            }
+        })
+    }catch(error) {
+        res.send({
+          status: "failed",
+          message: "Server Error",
+        });
+    }
+}
+}
